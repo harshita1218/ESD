@@ -1,0 +1,45 @@
+    AREA RESET, DATA, READONLY
+    EXPORT __Vectors
+__Vectors
+    DCD 0x100000FF        ; Stack pointer value when stack is empty
+    DCD Reset_Handler     ; Reset vector
+
+    ALIGN
+
+    AREA mycode, CODE, READONLY
+    EXPORT Reset_Handler
+    ENTRY
+
+Reset_Handler
+    ; Load the hexadecimal number
+    LDR R0, =N            ; Load the address of N into R0
+    LDR R1, [R0]         ; Load the hexadecimal number into R1
+
+    ; Extract the high nibble
+    MOV R2, R1           ; Copy the number to R2
+    LSR R2, R2, #4       ; 
+    AND R2, R2, #0x0F    ; Mask to get the high nibble (0x0 to 0x9)
+
+    ; Convert high nibble to BCD
+    MOV R3, #0x0A        ; Set R3 to 10 (decimal)
+    MUL R4, R2, R3       ; 
+
+    ; Extract the low nibble
+    MOV R2, R1           ; Restore R1 to R2
+    AND R2, R2, #0x0F    ; 
+
+    ; Convert low nibble to BCD
+    ADD R4, R4, R2       ; 
+
+    ; Store the result in memory
+    LDR R0, =BCD_Result  ; Load address of BCD_Result into R0
+    STR R4, [R0]         ; Store the BCD result
+
+STOP
+    B STOP               ; Infinite loop to halt the program
+
+    AREA myDATA, DATA, READWRITE
+N   DCD 0x1F            ; Example 2-digit hexadecimal number (0x1F)
+BCD_Result DCD 0        ; Memory location to store the BCD result
+
+    END
